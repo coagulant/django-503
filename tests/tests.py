@@ -11,7 +11,7 @@ from tests.views import test_index_page_text
 
 
 #noinspection PyUnresolvedReferences
-class MaintenanceTestCase(TestCase):
+class BackendTestCase(TestCase):
 
     def test_properly_configured(self):
         maintenance_middleware = 'django_503.middleware.MaintenanceMiddleware'
@@ -59,13 +59,19 @@ class MaintenanceTestCase(TestCase):
         option = Config.objects.create(key='maintenance', value=False)
         self.assertFalse(maintenance.is_enabled())
 
-        option.value=True
+        option.value = True
         option.save()
         self.assertTrue(maintenance.is_enabled())
 
 
-class Maintenance(TestCase):
-    
+class MaintenanceMessageTestCase(TestCase):
+
+    admin_warning = 'Site is on maintenance'
+
+    def create_admin_and_login(self):
+        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
+        self.assertTrue(self.client.login(username='admin', password='foobar'))
+
     def test_user_sees_503_error_page_instead_of_index_page(self):
         response = self.client.get('/')
         self.assertContains(response, test_index_page_text, status_code=200)
@@ -86,9 +92,8 @@ class Maintenance(TestCase):
         self.assertTemplateUsed(response, '503.html')
 
     def test_admin_doesnt_see_503_error_page_instead_of_actual_content(self):
-        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
-        self.assertTrue(self.client.login(username='admin', password='foobar'))
-        
+        self.create_admin_and_login()
+
         response = self.client.get('/')
         self.assertContains(response, test_index_page_text)
 
@@ -99,8 +104,7 @@ class Maintenance(TestCase):
     def test_admin_sees_warning_in_maintenance_mode_on_html_pages(self):
         admin_warning = 'Site is on maintenance'
 
-        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
-        self.assertTrue(self.client.login(username='admin', password='foobar'))
+        self.create_admin_and_login()
         response = self.client.get('/')
         self.assertNotContains(response, admin_warning)
 
@@ -110,19 +114,27 @@ class Maintenance(TestCase):
 
     def test_no_warnings_for_admin_on_non_html_pages(self):
         admin_warning = 'Site is on maintenance'
-        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
-        self.assertTrue(self.client.login(username='admin', password='foobar'))
+        self.create_admin_and_login()
         maintenance.enable()
         response = self.client.get('/plaintext/')
         self.assertNotContains(response, admin_warning)
 
     def test_user_doesnt_see_warning_in_maintenance_mode(self):
-        admin_warning = 'Site is on maintenance'
-
         response = self.client.get('/')
-        self.assertNotContains(response, admin_warning)
+        self.assertNotContains(response, self.admin_warning)
 
         maintenance.enable()
         response = self.client.get('/')
-        self.assertNotContains(response, admin_warning, status_code=503)
+        self.assertNotContains(response, self.admin_warning, status_code=503)
 
+
+class MaintenanceAdminTestCase(TestCase):
+
+    def create_admin_and_login(self):
+        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
+        self.assertTrue(self.client.login(username='admin', password='foobar'))
+
+    def test_admin_accessible(self):
+        self.create_admin_and_login()
+        response = self.client.get('/admin/django_503/config/')
+        self.assertEquals(response.status_code, 200)
