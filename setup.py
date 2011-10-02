@@ -6,7 +6,6 @@ read = lambda filepath: codecs.open(filepath, 'r', 'utf-8').read()
 
 tests_require = [
     'Django>=1.2,<1.4',
-    'mock>=0.7.2',
 ]
 
 setup(
@@ -25,7 +24,7 @@ setup(
     test_suite = "runtests",
     extras_require={'test': tests_require},
     classifiers = [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Framework :: Django',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
