@@ -3,7 +3,7 @@ from django_503.views import view_503
 
 class MaintenanceMiddleware:
     def process_request(self, request):
-        if maintenance.is_enabled():
+        if maintenance.is_enabled() and not request.user.is_staff:
             return view_503(request)
         return
 

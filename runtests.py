@@ -33,12 +33,9 @@ settings.configure(DEBUG = True,
                    PYLINT_RCFILE = os.path.join(ROOT_PATH, 'tests', 'pylint.rc'),
                    ROOT_URLCONF = 'tests.urls',
                    MIDDLEWARE_CLASSES = (
-                        'django_503.middleware.MaintenanceMiddleware',
-                        'django.middleware.common.CommonMiddleware',
                         'django.contrib.sessions.middleware.SessionMiddleware',
-                        'django.middleware.csrf.CsrfViewMiddleware',
                         'django.contrib.auth.middleware.AuthenticationMiddleware',
-                        'django.contrib.messages.middleware.MessageMiddleware',
+                        'django_503.middleware.MaintenanceMiddleware',
                    ),
 )
 
