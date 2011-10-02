@@ -66,7 +66,7 @@ class MaintenanceTestCase(TestCase):
 
 class Maintenance(TestCase):
     
-    def test_show_503_index(self):
+    def test_user_sees_503_error_page_instead_of_index_page(self):
         response = self.client.get('/')
         self.assertContains(response, test_index_page_text, status_code=200)
         self.assertTemplateNotUsed(response, '503.html')
@@ -76,8 +76,17 @@ class Maintenance(TestCase):
         self.assertNotContains(response, test_index_page_text, status_code=503)
         self.assertTemplateUsed(response, '503.html')
 
-    def test_admin_doesnt_see_503(self):
-        admin = User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
+    def test_user_sees_503_instead_of_redirect(self):
+        response = self.client.get('/redirect/', follow=True)
+        self.assertRedirects(response, '/', status_code=301)
+
+        maintenance.enable()
+        response = self.client.get('/redirect/', follow=True)
+        self.assertFalse(response.redirect_chain)
+        self.assertTemplateUsed(response, '503.html')
+
+    def test_admin_doesnt_see_503_error_page_instead_of_actual_content(self):
+        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
         self.assertTrue(self.client.login(username='admin', password='foobar'))
         
         response = self.client.get('/')
@@ -87,11 +96,33 @@ class Maintenance(TestCase):
         response = self.client.get('/')
         self.assertContains(response, test_index_page_text)
 
-    def test_show_503_redirect(self):
-        response = self.client.get('/redirect/', follow=True)
-        self.assertRedirects(response, '/', status_code=301)
+    def test_admin_sees_warning_in_maintenance_mode_on_html_pages(self):
+        admin_warning = 'Site is on maintenance'
+
+        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
+        self.assertTrue(self.client.login(username='admin', password='foobar'))
+        response = self.client.get('/')
+        self.assertNotContains(response, admin_warning)
 
         maintenance.enable()
-        response = self.client.get('/redirect/', follow=True)
-        self.assertFalse(response.redirect_chain)
-        self.assertTemplateUsed(response, '503.html')
+        response = self.client.get('/')
+        self.assertContains(response, admin_warning)
+
+    def test_no_warnings_for_admin_on_non_html_pages(self):
+        admin_warning = 'Site is on maintenance'
+        User.objects.create_superuser('admin', 'admin@foo.bar', 'foobar')
+        self.assertTrue(self.client.login(username='admin', password='foobar'))
+        maintenance.enable()
+        response = self.client.get('/plaintext/')
+        self.assertNotContains(response, admin_warning)
+
+    def test_user_doesnt_see_warning_in_maintenance_mode(self):
+        admin_warning = 'Site is on maintenance'
+
+        response = self.client.get('/')
+        self.assertNotContains(response, admin_warning)
+
+        maintenance.enable()
+        response = self.client.get('/')
+        self.assertNotContains(response, admin_warning, status_code=503)
+
