@@ -63,6 +63,10 @@ class BackendTestCase(TestCase):
         option.save()
         self.assertTrue(maintenance.is_enabled())
 
+    def test_maintenance_check_empty_table(self):
+        self.assertFalse(maintenance.is_enabled())
+        self.assertFalse(Config.objects.get(key='maintenance').value)
+
 
 class MaintenanceMessageTestCase(TestCase):
 

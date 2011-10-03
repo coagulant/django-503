@@ -4,6 +4,7 @@ def is_enabled():
     try:
         return Config.objects.get(key='maintenance').value
     except Config.DoesNotExist:
+        disable()
         return False
 
 def change(value):
