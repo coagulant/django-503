@@ -21,8 +21,8 @@ class BackendTestCase(TestCase):
             msg='Maintenance middleware should be added to MIDDLEWARE_CLASSES in settings.py')
         self.assertTrue(auth_middleware in settings.MIDDLEWARE_CLASSES,
             msg='Auth middleware should be added to MIDDLEWARE_CLASSES in settings.py')
-        self.assertTrue((settings.MIDDLEWARE_CLASSES.index(maintenance_middleware) >
-                        settings.MIDDLEWARE_CLASSES.index(auth_middleware)),
+        self.assertTrue((list(settings.MIDDLEWARE_CLASSES).index(maintenance_middleware) >
+                        list(settings.MIDDLEWARE_CLASSES).index(auth_middleware)),
                         msg='Put maintenance middleware after Auth middleware in MIDDLEWARE_CLASSES')
 
     def test_maintenance_enable(self):
