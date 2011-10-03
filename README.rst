@@ -19,6 +19,7 @@ It works well with search engine crawlers, your page index will stay intact if y
 Installation
 ------------
 
+Django-503 works with python>=2.5 and django>=1.2
 Recommended way to install is pip::
 
   pip install django-503
