@@ -17,9 +17,9 @@ class BackendTestCase(TestCase):
         maintenance_middleware = 'django_503.middleware.MaintenanceMiddleware'
         auth_middleware = 'django.contrib.auth.middleware.AuthenticationMiddleware'
 
-        self.assertIn(maintenance_middleware, settings.MIDDLEWARE_CLASSES,
+        self.assertTrue(maintenance_middleware in settings.MIDDLEWARE_CLASSES,
             msg='Maintenance middleware should be added to MIDDLEWARE_CLASSES in settings.py')
-        self.assertIn(auth_middleware, settings.MIDDLEWARE_CLASSES,
+        self.assertTrue(auth_middleware in settings.MIDDLEWARE_CLASSES,
             msg='Auth middleware should be added to MIDDLEWARE_CLASSES in settings.py')
         self.assertGreater(settings.MIDDLEWARE_CLASSES.index(maintenance_middleware),
                            settings.MIDDLEWARE_CLASSES.index(auth_middleware),
