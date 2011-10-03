@@ -18,8 +18,6 @@ setup(
     license='MIT',
     description="An app to show 503 error page, while your django site is on maintenance.",
     long_description=read(path.join(path.dirname(__file__), 'README.rst')),
-    install_requires=[
-    ],
     tests_require=tests_require,
     test_suite = "runtests",
     extras_require={'test': tests_require},

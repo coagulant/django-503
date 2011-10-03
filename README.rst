@@ -42,14 +42,18 @@ after session and auth middlewares like this::
         'django_503.middleware.MaintenanceMiddleware',
     )
 
-* Make sure, you use ``admin.autodiscover()`` to enable project admin.py
+* Run ``python manage.py syncdb``
+
+* Make sure you use ``admin.autodiscover()`` to enable project ``admin.py``.
 
 Usage
 -----
 
 You can turn on maintenance mode by changing app config via django admin interface.
-It's located at ``/admin/django_503/config/``. Setting `mainteneance` to True will turn 503 error page for regular users.
-Admins will see a warning on top of every html page, stating site is on maintenance now.
+It's located at url ``/admin/django_503/config/`` relative your site URL .
+Setting `mainteneance` to True will turn 503 error page for regular users.
+Admins will see a warning on top of every html page, stating site is on maintenance now,
+so that they can still access site and not forget to switch 503 mode off.
 
 
 Template overriding
@@ -63,3 +67,4 @@ Tests
 To run app testsuite use::
 
   python setup.py test django-503
+  
