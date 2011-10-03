@@ -14,7 +14,7 @@ class MaintenanceMiddleware:
 
     def process_response(self, request, response):
         if maintenance.is_enabled() and request.user.is_staff and self.is_html_response(response):
-            template = get_template('maintenance_warning.html')
+            template = get_template('admin_warning.html')
             warning_message = template.render(Context())
             response.content = re.sub(r'<body.*>', '\g<0>' + warning_message, response.content)
         return response
